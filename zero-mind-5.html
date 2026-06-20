@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>ZERO MIND — 脳書き換え達人訓練</title>
+<style>
+:root{
+  --bg:#f5f5fa;
+  --bg2:#ebebf2;
+  --bg3:#e4e4ee;
+  --card:#ffffff;
+  --card2:#f4f4fc;
+  --bor:#d4d4e8;
+  --bor2:#c0c0d8;
+  --gold:#c9a84c;
+  --gold2:#e8c97a;
+  --red:#e63946;
+  --teal:#2ec4b6;
+  --purple:#7c3aed;
+  --purple2:#a855f7;
+  --txt:#1a1a2e;
+  --txt2:#5858a8;
+  --txt3:#9898b8;
+  --sh:0 8px 32px rgba(0,0,0,.6);
+  --sh2:0 2px 12px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--txt);font-family:'Hiragino Sans','Noto Sans JP',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* ── スプラッシュ ── */
+#splash{position:fixed;inset:0;background:linear-gradient(135deg,#1a1400,#2a2000);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .8s;}
+#splash.hide{opacity:0;pointer-events:none;}
+.splash-kanji{font-size:80px;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:pulse 2s ease-in-out infinite;}
+.splash-title{font-size:14px;letter-spacing:8px;color:var(--gold2);margin-top:8px;opacity:.8;}
+.splash-sub{font-size:11px;color:var(--txt3);margin-top:24px;letter-spacing:2px;}
+@keyframes pulse{0%,100%{opacity:.7;}50%{opacity:1;}}
+
+/* ── 共通 ── */
+.screen{display:none;min-height:100vh;padding-bottom:80px;}
+.screen.active{display:block;}
+.glow-line{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0;}
+
+/* ── ナビ ── */
+#nav{position:fixed;bottom:0;left:0;right:0;background:rgba(245,245,250,.96);backdrop-filter:blur(20px);border-top:1px solid var(--bor);display:flex;z-index:100;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;border:none;background:none;color:var(--txt3);font-size:9px;font-family:inherit;cursor:pointer;transition:.2s;letter-spacing:.5px;}
+.nav-btn.active{color:var(--gold);}
+.nav-btn span{font-size:20px;}
+
+/* ── ホーム ── */
+.home-hero{padding:40px 20px 24px;text-align:center;position:relative;overflow:hidden;}
+.home-hero::before{content:'無';position:absolute;font-size:200px;font-weight:900;color:rgba(201,168,76,.04);top:-20px;left:50%;transform:translateX(-50%);pointer-events:none;}
+.hero-eyebrow{font-size:10px;letter-spacing:4px;color:var(--gold);margin-bottom:12px;}
+.hero-title{font-size:28px;font-weight:900;line-height:1.2;margin-bottom:8px;}
+.hero-title em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:12px;color:var(--txt2);line-height:1.8;}
+
+/* ── モード選択 ── */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0 16px 20px;}
+.mode-card{background:var(--card);border:1px solid var(--bor);border-radius:16px;padding:16px 10px;text-align:center;cursor:pointer;transition:.2s;position:relative;overflow:hidden;}
+.mode-card::before{content:'';position:absolute;inset:0;opacity:0;transition:.3s;}
+.mode-card:active{transform:scale(.96);}
+.mode-card.budo::before{background:linear-gradient(135deg,rgba(230,57,70,.1),transparent);}
+.mode-card.renai::before{background:linear-gradient(135deg,rgba(124,58,237,.1),transparent);}
+.mode-card.jinsei::before{background:linear-gradient(135deg,rgba(46,196,182,.1),transparent);}
+.mode-card:active::before{opacity:1;}
+.mode-icon{font-size:28px;margin-bottom:6px;}
+.mode-name{font-size:11px;font-weight:700;letter-spacing:1px;}
+.mode-name.budo{color:var(--red);}
+.mode-name.renai{color:var(--purple2);}
+.mode-name.jinsei{color:var(--teal);}
+.mode-tag{font-size:9px;color:var(--txt3);margin-top:3px;}
+
+/* ── 今日のミッション ── */
+.section{padding:0 16px 16px;}
+.sec-label{font-size:9px;letter-spacing:3px;color:var(--gold);margin-bottom:12px;}
+.mission-card{background:#fff;border:1.5px solid var(--bor);border-radius:16px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.mission-phase{font-size:9px;letter-spacing:2px;color:var(--txt3);margin-bottom:6px;}
+.mission-text{font-size:14px;font-weight:700;line-height:1.7;margin-bottom:14px;}
+.mission-done-btn{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold),#a8832a);color:#0a0a0f;font-size:13px;font-weight:900;cursor:pointer;letter-spacing:1px;}
+
+/* ── 成長レーダー ── */
+.radar-wrap{background:#fff;border:1.5px solid var(--bor);border-radius:16px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.radar-title{font-size:12px;font-weight:700;color:var(--txt2);margin-bottom:14px;text-align:center;}
+.radar-bars{display:flex;flex-direction:column;gap:10px;}
+.rbar{display:flex;align-items:center;gap:10px;}
+.rbar-label{font-size:10px;color:var(--txt2);width:60px;flex-shrink:0;}
+.rbar-track{flex:1;height:4px;background:var(--bor2);border-radius:2px;overflow:hidden;}
+.rbar-fill{height:100%;border-radius:2px;transition:width 1s ease;}
+.rbar-fill.budo{background:linear-gradient(90deg,var(--red),#ff6b6b);}
+.rbar-fill.renai{background:linear-gradient(90deg,var(--purple),var(--purple2));}
+.rbar-fill.jinsei{background:linear-gradient(90deg,var(--teal),#7efff5);}
+.rbar-pct{font-size:10px;color:var(--gold);width:28px;text-align:right;flex-shrink:0;}
+
+/* ── 道場（AIチャット） ── */
+.dojo-header{padding:20px 16px 0;display:flex;gap:10px;align-items:flex-start;}
+.chara-select{display:flex;gap:8px;padding:0 16px 14px;overflow-x:auto;scrollbar-width:none;}
+.chara-select::-webkit-scrollbar{display:none;}
+.chara-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 14px;border-radius:12px;border:1px solid var(--bor);background:var(--card);cursor:pointer;transition:.2s;}
+.chara-btn.active{border-color:var(--gold);background:rgba(201,168,76,.1);}
+.chara-avatar{font-size:24px;}
+.chara-name{font-size:10px;font-weight:700;color:var(--txt2);}
+.chara-btn.active .chara-name{color:var(--gold);}
+
+.chat-area{padding:0 16px;min-height:200px;margin-bottom:10px;}
+.chat-msg{margin-bottom:14px;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.chat-msg.user{text-align:right;}
+.chat-bubble{display:inline-block;padding:11px 14px;border-radius:16px;font-size:13px;line-height:1.7;max-width:85%;text-align:left;}
+.chat-msg.ai .chat-bubble{background:#fff;border:1.5px solid var(--bor);color:var(--txt);}
+.chat-msg.user .chat-bubble{background:linear-gradient(135deg,#3a2a6a,#4a1a7a);color:#e8d8ff;border:1px solid rgba(124,58,237,.3);}
+.chat-msg .chara-label{font-size:9px;color:var(--gold);letter-spacing:1px;margin-bottom:5px;}
+
+.chat-input-area{padding:10px 16px 0;display:flex;gap:8px;}
+.chat-ta{flex:1;background:#fff;border:1.5px solid var(--bor);border-radius:12px;padding:11px 14px;color:var(--txt);font-size:13px;font-family:inherit;resize:none;outline:none;height:44px;max-height:100px;transition:height .1s;}
+.chat-ta:focus{border-color:var(--bor2);}
+.chat-send{width:44px;height:44px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold),#a8832a);color:#0a0a0f;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+
+/* ── 訓練（モード詳細） ── */
+.phase-tabs{display:flex;gap:0;border-bottom:1px solid var(--bor);margin:0 16px 16px;overflow-x:auto;scrollbar-width:none;}
+.phase-tabs::-webkit-scrollbar{display:none;}
+.phase-tab{flex-shrink:0;padding:10px 16px;border:none;background:none;color:var(--txt3);font-size:11px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;letter-spacing:.5px;}
+.phase-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+.training-card{background:#fff;border:1.5px solid var(--bor);border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.training-num{font-size:9px;letter-spacing:2px;color:var(--txt3);margin-bottom:6px;}
+.training-title{font-size:15px;font-weight:800;margin-bottom:10px;color:var(--txt);}
+.training-method{font-size:12px;color:var(--txt2);line-height:1.8;margin-bottom:12px;padding:10px;background:var(--bg3);border-radius:8px;border-left:2px solid var(--gold);}
+.training-effect{font-size:11px;color:var(--teal);line-height:1.7;}
+.training-effect::before{content:'▶ 脳への効果：';font-weight:700;opacity:.7;}
+.timer-btn{margin-top:12px;padding:10px 20px;border-radius:8px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.timer-btn.running{background:rgba(201,168,76,.1);}
+
+/* ── ジャーナル ── */
+.journal-entry{background:#fff;border:1.5px solid var(--bor);border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.journal-date{font-size:10px;color:var(--txt3);margin-bottom:6px;}
+.journal-mode-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:8px;}
+.badge-budo{background:rgba(230,57,70,.15);color:var(--red);}
+.badge-renai{background:rgba(124,58,237,.15);color:var(--purple2);}
+.badge-jinsei{background:rgba(46,196,182,.15);color:var(--teal);}
+.journal-text{font-size:12px;color:var(--txt2);line-height:1.8;}
+.journal-ai-insight{font-size:11px;color:var(--gold);margin-top:10px;padding:8px;background:rgba(201,168,76,.05);border-radius:8px;border-left:2px solid var(--gold);line-height:1.7;}
+
+/* ── フォーム ── */
+.jform{padding:16px;background:#fff;border-top:1.5px solid var(--bor);position:sticky;bottom:80px;}
+.jform-ta{width:100%;background:#fff;border:1.5px solid var(--bor);border-radius:10px;padding:11px 14px;color:var(--txt);font-size:13px;font-family:inherit;resize:none;outline:none;}
+.jform-btns{display:flex;gap:8px;margin-top:8px;}
+.jform-mode-sel{flex:1;padding:9px;border-radius:8px;border:1px solid var(--bor);background:var(--bg3);color:var(--txt2);font-size:11px;font-family:inherit;}
+.jform-save{padding:9px 18px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--gold),#a8832a);color:#0a0a0f;font-size:12px;font-weight:800;cursor:pointer;}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(201,168,76,.95);color:#0a0a0f;padding:10px 20px;border-radius:20px;font-size:12px;font-weight:700;z-index:9999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap;}
+#toast.show{opacity:1;}
+
+/* ── キラーフレーズゲーム ── */
+.kp-chara-card{background:linear-gradient(135deg,var(--purple-xl,rgba(124,58,237,.08)),rgba(168,85,247,.05));border:1.5px solid rgba(124,58,237,.25);border-radius:12px;padding:14px;margin-bottom:10px;}
+.kp-chara-label{font-size:9px;letter-spacing:2px;color:var(--purple,#7c3aed);margin-bottom:6px;font-weight:800;}
+.kp-chara-text{font-size:13px;font-weight:800;color:var(--txt,#1a1a2e);line-height:1.6;}
+.kp-chara-sub{font-size:11px;color:var(--txt2,#5858a8);margin-top:4px;line-height:1.6;}
+.kp-input{width:100%;padding:11px;background:var(--bg3,#16162a);border:1.5px solid var(--bor,#2a2a4a);border-radius:10px;color:var(--txt,#e8e8f0);font-size:12px;font-family:inherit;resize:none;outline:none;line-height:1.7;box-sizing:border-box;}
+.kp-score{text-align:center;padding:10px;border-radius:10px;font-size:28px;font-weight:900;margin:8px 0;}
+.kp-score.s{color:#22c55e;background:rgba(34,197,94,.1);}
+.kp-score.a{color:#3b82f6;background:rgba(59,130,246,.1);}
+.kp-score.b{color:var(--gold,#c9a84c);background:rgba(201,168,76,.1);}
+.kp-score.c{color:var(--txt3,#5858a8);background:rgba(88,88,168,.08);}
+.kp-killer{background:rgba(168,85,247,.08);border:1.5px solid rgba(168,85,247,.25);border-radius:10px;padding:12px;font-size:13px;color:var(--purple2,#a855f7);line-height:1.8;font-weight:700;margin:8px 0;}
+
+/* ── デカップリング判定ゲーム ── */
+.dc-scenario{background:linear-gradient(135deg,rgba(230,57,70,.08),rgba(124,58,237,.05));border:1.5px solid rgba(230,57,70,.2);border-radius:12px;padding:14px;margin-bottom:12px;}
+.dc-scenario-label{font-size:9px;letter-spacing:2px;color:var(--red,#e63946);margin-bottom:8px;font-weight:800;}
+.dc-scores{display:flex;gap:10px;margin:10px 0;}
+.dc-score-item{flex:1;text-align:center;padding:8px;background:rgba(0,0,0,.05);border-radius:8px;}
+.dc-score-val{font-size:22px;font-weight:900;}
+.dc-score-lbl{font-size:9px;color:var(--txt2);margin-top:2px;}
+.dc-scene{font-size:12px;color:var(--txt);line-height:1.8;margin-top:8px;}
+.dc-choice-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.dc-btn{padding:14px;border-radius:12px;border:none;font-size:14px;font-weight:900;cursor:pointer;font-family:inherit;transition:.15s;}
+.dc-btn:active{transform:scale(.96);}
+.dc-pull{background:linear-gradient(135deg,#c20030,var(--red,#e63946));color:#fff;box-shadow:0 4px 16px rgba(230,57,70,.3);}
+.dc-stay{background:var(--card2,#1c1c28);color:var(--txt2);border:1.5px solid var(--bor);}
+.dc-correct{background:rgba(34,197,94,.1);border:1.5px solid #22c55e;border-radius:10px;padding:12px;font-size:12px;color:#22c55e;line-height:1.8;margin:8px 0;font-weight:700;}
+.dc-wrong{background:rgba(230,57,70,.08);border:1.5px solid rgba(230,57,70,.3);border-radius:10px;padding:12px;font-size:12px;color:var(--red,#e63946);line-height:1.8;margin:8px 0;}
+#timer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9000;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#timer-overlay.show{display:flex;}
+.timer-display{font-size:72px;font-weight:900;color:var(--gold);font-variant-numeric:tabular-nums;}
+.timer-label{font-size:14px;color:var(--txt2);letter-spacing:2px;}
+.timer-close{padding:12px 28px;border-radius:12px;border:1px solid var(--bor);background:transparent;color:var(--txt2);font-size:14px;cursor:pointer;font-family:inherit;}
+
+/* ── Firebase module ── */
+</style>
+</head>
+<body>
+
+<!-- スプラッシュ -->
+<div id="splash">
+  <div class="splash-kanji">無</div>
+  <div class="splash-title">ZERO MIND</div>
+  <div class="splash-sub">脳書き換え達人訓練</div>
+</div>
+
+<!-- ホーム -->
+<div id="screen-home" class="screen active">
+  <div class="home-hero">
+    <div class="hero-eyebrow">MASTERY ROADMAP</div>
+    <div class="hero-title">脳のOSを<br><em>達人モード</em>へ</div>
+    <div class="hero-sub" style="margin-top:10px;">武道・恋愛・人生<br>すべての場面で主導権を握る</div>
+  </div>
+  <div class="glow-line"></div>
+
+  <!-- モード選択 -->
+  <div style="padding:20px 16px 10px;"><div class="sec-label">モードを選ぶ</div></div>
+  <div class="mode-grid">
+    <div class="mode-card budo" onclick="goTraining('budo')">
+      <div class="mode-icon">🥷</div>
+      <div class="mode-name budo">武道</div>
+      <div class="mode-tag">身体の崩し</div>
+    </div>
+    <div class="mode-card renai" onclick="goTraining('renai')">
+      <div class="mode-icon">🌒</div>
+      <div class="mode-name renai">恋愛</div>
+      <div class="mode-tag">心の引力</div>
+    </div>
+    <div class="mode-card jinsei" onclick="goTraining('jinsei')">
+      <div class="mode-icon">🌌</div>
+      <div class="mode-name jinsei">人生</div>
+      <div class="mode-tag">現実の磁場</div>
+    </div>
+  </div>
+
+  <!-- 今日のミッション -->
+  <div class="section">
+    <div class="sec-label">今日のミッション</div>
+    <div class="mission-card" id="mission-card">
+      <div class="mission-phase" id="mission-phase">第1階層 — 覚醒</div>
+      <div class="mission-text" id="mission-text">読み込み中...</div>
+      <button class="mission-done-btn" onclick="completeMission()">✓ 完了した</button>
+    </div>
+  </div>
+
+  <!-- 成長レーダー -->
+  <div class="section">
+    <div class="sec-label">脳OS更新状況</div>
+    <div class="radar-wrap">
+      <div class="radar-title">12の習得ポイント</div>
+      <div class="radar-bars" id="radar-bars"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 道場（AIチャット） -->
+<div id="screen-dojo" class="screen">
+  <div style="padding:24px 16px 0;">
+    <div class="sec-label">DOJO — 達人に問う</div>
+    <div style="font-size:12px;color:var(--txt2);margin-bottom:16px;">達人キャラクターを選んで問いかけよう</div>
+  </div>
+  <div class="chara-select">
+    <div class="chara-btn active" onclick="selectChara('muto')" id="btn-muto">
+      <div class="chara-avatar">⚔️</div>
+      <div class="chara-name">無刀斎</div>
+    </div>
+    <div class="chara-btn" onclick="selectChara('midori')" id="btn-midori">
+      <div class="chara-avatar">🌙</div>
+      <div class="chara-name">碧</div>
+    </div>
+    <div class="chara-btn" onclick="selectChara('kuro')" id="btn-kuro">
+      <div class="chara-avatar">🌑</div>
+      <div class="chara-name">玄</div>
+    </div>
+  </div>
+  <div class="chat-area" id="chat-area"></div>
+  <div class="chat-input-area">
+    <textarea class="chat-ta" id="chat-ta" placeholder="達人に問いかける..." rows="1"
+      oninput="autoResize(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+    <button class="chat-send" onclick="sendChat()">↑</button>
+  </div>
+</div>
+
+<!-- 訓練 -->
+<div id="screen-training" class="screen">
+  <div style="padding:24px 16px 14px;">
+    <div class="sec-label" id="training-eyebrow">武道モード</div>
+  </div>
+  <div class="phase-tabs" id="phase-tabs">
+    <button class="phase-tab active" data-phase="0" onclick="switchPhase(0)">第1階層 覚醒</button>
+    <button class="phase-tab" data-phase="1" onclick="switchPhase(1)">第2階層 変革</button>
+    <button class="phase-tab" data-phase="2" onclick="switchPhase(2)">第3階層 統御</button>
+    <button class="phase-tab" data-phase="3" onclick="switchPhase(3)">第4階層 神妙</button>
+  </div>
+  <div style="padding:0 16px 20px;" id="training-content"></div>
+</div>
+
+<!-- ジャーナル -->
+<div id="screen-journal" class="screen">
+  <div style="padding:24px 16px 0;">
+    <div class="sec-label">JOURNAL — 気づきを刻む</div>
+    <div style="font-size:11px;color:var(--txt2);margin-bottom:14px;">今日の訓練で気づいたことを記録する。AIが達人フレームで解釈する。</div>
+  </div>
+  <div id="journal-list" style="padding:0 16px;"></div>
+  <div class="jform">
+    <textarea class="jform-ta" id="jform-ta" rows="3" placeholder="今日の訓練・気づき・体験を書く..."></textarea>
+    <div class="jform-btns">
+      <select class="jform-mode-sel" id="jform-mode">
+        <option value="budo">🥷 武道</option>
+        <option value="renai">🌒 恋愛</option>
+        <option value="jinsei">🌌 人生</option>
+      </select>
+      <button class="jform-save" onclick="saveJournal()">記録 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ナビ -->
+<nav id="nav">
+  <button class="nav-btn active" onclick="goScreen('home')" id="nav-home"><span>⚡</span>ホーム</button>
+  <button class="nav-btn" onclick="goScreen('dojo')" id="nav-dojo"><span>🗡️</span>道場</button>
+  <button class="nav-btn" onclick="goScreen('training')" id="nav-training"><span>🥷</span>訓練</button>
+  <button class="nav-btn" onclick="goScreen('journal')" id="nav-journal"><span>📿</span>記録</button>
+</nav>
+
+<div id="toast"></div>
+
+<!-- タイマー -->
+<div id="timer-overlay">
+  <div class="timer-label" id="timer-label">訓練中</div>
+  <div class="timer-display" id="timer-display">3:00</div>
+  <button class="timer-close" onclick="stopTimer()">終了</button>
+</div>
+
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import{getFirestore,collection,addDoc,getDocs,query,orderBy,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import{getAuth,signInAnonymously,onAuthStateChanged}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+const cfg={
+  apiKey:"AIzaSyCVk2miG5TK1ffTofXLh0hHgeSbOvmIgZ8",
+  authDomain:"kensetsu-nippo-842a2.firebaseapp.com",
+  projectId:"kensetsu-nippo-842a2",
+  storageBucket:"kensetsu-nippo-842a2.appspot.com",
+  appId:"1:616725801469:web:5b8c82e0c1f7b0baf2a0ee"
+};
+const app=initializeApp(cfg);
+const db=getFirestore(app);
+const auth=getAuth(app);
+signInAnonymously(auth).catch(e=>console.warn('auth',e));
+onAuthStateChanged(auth,user=>{
+  if(user) window._uid=user.uid;
+});
+window.__zm={db,collection,addDoc,getDocs,query,orderBy,serverTimestamp};
+</script>
+
+<script>
+const FUNC_BASE='https://us-central1-kensetsu-nippo-842a2.cloudfunctions.net';
+const HH_KEY='HeartsHouse2026Key';
+
+// ═══ データ ═══
+const CHARAS={
+  muto:{
+    name:'無刀斎',
+    icon:'⚔️',
+    style:'剣客・厳格',
+    system:`あなたは「無刀斎（むとうさい）」という武道の達人です。
+口調は簡潔で厳しく、余計な言葉は使いません。
+すべての問いに対して「身体・視覚・脱力・予測」の観点から答えます。
+3〜5文で答え、最後に必ず「今日の稽古：〇〇をやれ」と一言添えます。
+脳科学の知見（サッカード抑制・フォワードモデル・脳間同期）を織り交ぜながら、武道的な言葉で語ります。`
+  },
+  midori:{
+    name:'碧',
+    icon:'🌙',
+    style:'恋愛・妖艶',
+    system:`あなたは「碧（みどり）」という恋愛の達人です。
+口調は知的で妖艶、少し謎めいています。
+すべての問いに対して「引力・予測エラー・同期と切断」の観点から答えます。
+3〜5文で答え、最後に必ず「今夜試すこと：〇〇」と添えます。
+脳科学（ドーパミン・脳間同期・フォワードモデル）を恋愛の文脈で語ります。`
+  },
+  kuro:{
+    name:'玄',
+    icon:'🌑',
+    style:'人生・哲学',
+    system:`あなたは「玄（くろ）」という人生の達人です。
+口調は静かで深く、禅的です。
+すべての問いに対して「俯瞰・磁場・主客一如」の観点から答えます。
+3〜5文で答え、最後に必ず「問い：〇〇について考えよ」と添えます。
+複雑系科学と東洋思想を融合させながら語ります。`
+  }
+};
+
+const TRAININGS={
+  budo:{
+    label:'🥷 武道モード',
+    color:'var(--red)',
+    phases:[
+      {name:'第1階層 視覚覚醒',items:[
+        {title:'遠山の目（周辺視野の常時稼働）',method:'対峙する相手の目・手元を凝視するのを100%禁止。ピントを「相手の背後の壁」や「空間の四隅」に合わせ、相手はその空間に浮かぶ「ひとつの影」として捉える。',effect:'サッカード（脳の視覚処理の一時停止）が消失。相手の予兆がミリ秒単位で早く検知できる。脳波がベータ波→アルファ波へ移行し、主観的時間がスローモーション化する。',timer:180,breath:null},
+        {title:'視線アンカリングの解除（歩行稽古）',method:'日常の歩行時、すれ違う人の顔を見るのではなく、空間全体を見たまますれ違う。目の焦点を「無限遠」に設定し、全体を一枚の静止画として捉える。',effect:'視覚情報処理が意識的ルートから無意識・空間的ルート（背側骨格路）へ切り替わる。中心視野の支配から解放される。',timer:0,breath:null}
+      ]},
+      {name:'第2階層 内部感覚ステルス化',items:[
+        {title:'エレイズ＆インターロセプション呼吸',method:'【鼻から4秒吸う→4秒止める→4秒かけて細く長く吐く】を1サイクルとして5セット繰り返す。息を吐く波に合わせて①顎の噛み締め②肩甲骨の間③土踏まずの緊張をこの順番で完全消去（エレイズ）する。「身体は骨組みと液体だけで満たされた袋」と脳内でマッピングする。',effect:'筋肉の緊張がゼロになり、相手の皮膚触覚センサーにあなたの「次の運動のベクトル（予兆）」が伝わらなくなる（ステルス状態）。島皮質が活性化し重心のミリ単位のコントロールが可能になる。',timer:120,breath:{inhale:4,hold1:4,exhale:4,hold2:0,sets:5,label:"エレイズ呼吸"}},
+        {title:'インターロセプション覚醒（心拍感知）',method:'呼吸しながら「自分の心臓の鼓動」を胸の中心から感じ取る。鼓動を1拍ずつ数えながら、重心の微細なズレ（ミリ単位）を同時に感知する。',effect:'脳の島皮質（内受容感覚の司令塔）が強烈に活性化。自分の重心のミリ単位のズレを自覚でき、相手の重心変化も感知できるようになる。',timer:300,breath:null}
+      ]},
+      {name:'第3階層 予測統御',items:[
+        {title:'アフォーダンス消去（0.5秒前ハック）',method:'相手が「次にこう動こう」と脳内で運動プログラムを確定させる直前（準備電位が発生する約0.5秒前）に、全く異なる方向への触覚シグナルまたは視線の外転を差し込む。',effect:'相手の脳は先回りして計算していた未来予測（フォワードモデル）を強制的に書き換えられ、運動回路がフリーズする（認知バグ）。',timer:0,breath:null},
+        {title:'非対称カオス・リズム',method:'表面上の動きのテンポは相手に完璧に同調させながら、自分の「呼吸のリズム」と「微細な重心移動のリズム」だけをあえて不規則（カオス）に揺らす。相手が読もうとすればするほど読めない状態を作る。',effect:'相手の脳に「予測できそうで、完全に予測できない」状態が生まれ、ドーパミンバーストが継続する。主導権は自動的にこちらに移行する。',timer:0,breath:null}
+      ]},
+      {name:'第4階層 主客一如',items:[
+        {title:'我欲消去（脳間同期ハック）',method:'「相手を倒そう・技をかけよう」という自我（操作意図）を脳内から完全に消去する。「私と相手は、同じ水槽を満たす一本の水流である」と処理し、自分の重心をフッと真上または真下に移動させる。',effect:'脳波（アルファ波・ガンマ波）の位相が相手の脳波と完全にロック（脳間同期）する。相手の脳はあなたの重心移動を「自分の運動命令」と誤認し、鏡のように自ら崩れていく。',timer:0,breath:null},
+        {title:'戦略的デカップリング（同期の切断）',method:'脳間同期が完成し相手が完全に引き込まれた絶頂のタイミングで、意図的に視線を逸らす・気配を完全に遮断する。「存在を消す」ことで崩しを完成させる。',effect:'相手の脳に最大級の予測エラーと喪失感を与える。これが決定的な「崩し（技の完成）」となる。',timer:0,breath:null}
+      ]}
+    ]
+  },
+  renai:{
+    label:'🌒 恋愛モード',
+    color:'var(--purple2)',
+    phases:[
+      {name:'第1階層 報酬系起動',items:[
+        {title:'パノラマ＆残像ワーク（網膜直結）',method:'デート中は相手を凝視せず、背景全体を捉える「周辺視野」をベースにしてアルファ波状態を作る。会話の区切りや沈黙の瞬間にだけ、ピントを相手の瞳（網膜）へ瞬時に合わせ、じっと3秒間見つめ続ける。',effect:'網膜（露出した脳）同士が一直線の光の軸で結ばれる。脳の線条体（報酬予測領域）がバーストし、ドーパミンが強制分泌される。相手の脳は「この人といるとドキドキする＝好きだ」という認知の書き換えを起こす。',timer:3,breath:null},
+        {title:'アルファ波状態の作り方（デート前儀式）',method:'【4秒吸い→4秒止め→4秒吐き】を3回繰り返し、周辺視野モードに入る。肩・顎・手の力を全て抜く。「空間全体を水のように満たす」イメージで呼吸する。',effect:'脳波がアルファ波へ移行し、沈黙や予測外の質問にスローモーションで対応できる「圧倒的な余裕」が生まれる。この余裕自体が「大人の色気」として相手に伝わる。',timer:72,breath:{inhale:4,hold1:4,exhale:4,hold2:0,sets:3,label:"アルファ波呼吸"}}
+      ]},
+      {name:'第2階層 生理同調',items:[
+        {title:'テンポ・トレース呼吸（エレイズ・セダクション）',method:'相手と対面した際、相手の「まばたきの頻度」「呼吸の深さ」「うなずきのテンポ」を静かに観察し、自分の呼吸をそこに意図的に同期させる。同時に肩・顎の力は完全に抜き、100%リラックスしたオープンな姿勢を維持する。',effect:'ミラーニューロンを通じてあなたの「副交感神経優位の状態」が相手の脳へコピーされる。相手は「この人といると、なぜか異常に落ち着く・素の自分になれる」と感じ、心の防御壁を自ら下げる。',timer:0,breath:null},
+        {title:'インターロセプション同調',method:'相手の「まばたき」「呼吸」「うなずき」のリズムを自分の内側で静かにトレース（意図的同期）する。「私の呼吸と相手の呼吸が同じ海の波である」とマッピングする。',effect:'脳波の位相がロックされ（脳間同期）、相手の脳はあなたを「自分と同質のもの・運命の相手」と処理するようになる。',timer:0,breath:null}
+      ]},
+      {name:'第3階層 予測破壊',items:[
+        {title:'アフォーダンス破壊（定番展開の消去）',method:'相手の脳が「次にこう来るだろう（口説かれる・引き留められる・LINEがすぐ来る）」と予測を確定させる手前で、あえて真逆の行動（最高の雰囲気でスッと離れる・盛り上がった瞬間に笑顔で帰る）を差し込む。',effect:'予測フォワードモデルが破壊され、強烈な「予測エラー」が発生。脳は「理解できそうで完全に理解できないもの」に最もドーパミンを分泌するため、相手の狩猟本能が永続的に刺激される。',timer:0,breath:null},
+        {title:'カオス・アイデンティティ',method:'自分の趣味・キャラ付けに一貫性を持たせず、不規則な揺らぎを見せる。「基本インドア」と言った翌週には「秘境温泉に一人で行ってきた」など、相手の「この人はこういうキャラだ」という分類を拒む。',effect:'人間の脳は「理解できそうで完全に理解できないもの」に最も依存物質（ドーパミン）を分泌する。掴みどころのなさが相手の狩猟本能を刺激し続ける。',timer:0,breath:null},
+        {title:'🎯 キラーフレーズ実践ゲーム',method:'AIがランダムな相手キャラクター（表向き）を提示する。ユーザーはその「陰（隠された本音・孤独・渇望）」を推測して入力。AIが採点し、より精度の高い「陰の言い当て方」と実際に使えるキラーフレーズを出力する。',effect:'バーナム効果×アフォーダンス破壊の精度が上がる。繰り返すうちに「目の前の人の陰」を瞬時に読む反射が身につく。',timer:0,breath:null,game:'killer_phrase'}
+      ]},
+      {name:'第4階層 戦略的断絶',items:[
+        {title:'ハイパースキャニング・ハック（我欲の消去）',method:'「落としたい・良く見られたい」というエゴ（操作意図）を完全に消去する。ただ「目の前の相手を世界で一番楽しませる・包み込む」という純粋な意識だけで対峙する。自分のパフォーマンスへの意識をゼロにする。',effect:'脳間同期が極限まで高まり、二人の境界線が消える。あなたが切ない表情をすれば相手も切なくなる「感情の完全遠隔操作」が可能になる。',timer:0,breath:null},
+        {title:'戦略的デカップリング（執着の植え付け）',method:'相手が「この人とは運命レベルで気が合う！離れたくない！」と完全に依存した絶頂のタイミングで、意図的に連絡を遅くする・ミステリアスな冷徹な距離感を提示する。',effect:'完璧に繋がっていた脳間同期が突如遮断され、相手の脳は猛烈な予測エラーと喪失感を起こす。脳はそのバグを解決しようとして24時間あなたのことを考え続ける。これが「執着（恋煩い）」の完成。',timer:0,breath:null},
+        {title:'⚡ デカップリング判定ゲーム',method:'AIがランダムなシナリオ（SYNスコア・CHAOSスコア・場面状況）を提示する。ユーザーは「今すぐ引く」か「まだ引かない」かを判断する。正解・不正解とその理由をAIが解説。',effect:'「今が絶頂か」を感覚で掴む判断力が養われる。SYNスコアを頭ではなく反射で読む能力が身につく。',timer:0,breath:null,game:'decouple_judgment'}
+      ]}
+    ]
+  },
+  jinsei:{
+    label:'🌌 人生モード',
+    color:'var(--teal)',
+    phases:[
+      {name:'第1階層 大局認知',items:[
+        {title:'空間俯瞰瞑想（パノラマ・ヴィジョン）',method:'トラブル・怒っている人間・目先の数字が現れたとき、それを凝視するのを即座にやめる。視野の枠を極限まで広げ、問題を取り巻く「空間全体・人間関係のパワーバランス・時間的背景」を一枚の静止画として広く捉える。',effect:'扁桃体が闘争逃走反応（パニック・防衛）を起こさなくなる。脳波がベータ波からアルファ波へ切り替わり、認知の許容量が爆発的に拡大。トラブルの本質（解決の糸口）が静かに見え始める。',timer:180,breath:null},
+        {title:'ラベリングの拒否（純粋知覚）',method:'起きた出来事に「最悪だ」「チャンスだ」とすぐに白黒つけるのを完全にやめる。「ただ、そういう現象が目の前で起きている」とだけ認識する。評価・判断・感情のラベルを貼ることを意図的に拒否する。',effect:'前頭前野の評価フィルターが緩み、状況の多面的な可能性が同時に認識できるようになる。「敵か味方か」のバイナリ思考から解放される。',timer:0,breath:null}
+      ]},
+      {name:'第2階層 内環境独立',items:[
+        {title:'ボックス呼吸×エレイズ・エゴ',method:'理不尽な環境・プレッシャー・他人の負の感情に直面した瞬間、【4秒吸い→4秒止め→4秒吐き→4秒止める】を5セット行う（ボックス呼吸）。吐く波に合わせて奥歯・肩・呼吸の緊張を完全解放。外部のノイズへの脳内ラベリング（最悪だ・どうしよう等）を拒否し、内側を「完全な真空」にする。',effect:'周囲の焦りや恐怖への自律神経レベルでの生理同期を遮断できる。あなたが圧倒的な静けさを維持すると、逆に周囲の脳があなたのアルファ波・低心拍リズムに引き込まれ、主導権を自動的に譲り渡す。',timer:320,breath:{inhale:4,hold1:4,exhale:4,hold2:4,sets:5,label:"ボックス呼吸"}},
+        {title:'島皮質活性化（内受容感覚の鋭敏化）',method:'重大な決断をするとき、思考のロジックだけでなく「今、自分の胃・心臓・横隔膜はどんな感覚を放っているか」を微細に感知する。「違和感か、心地よさか」だけを判断基準にする練習。',effect:'島皮質と前帯状皮質が連携し、論理では捉えられないパターン認識（直感）が意識に上がってくる。達人の「勘」の正体はこの内受容感覚の精度である。',timer:0,breath:null}
+      ]},
+      {name:'第3階層 環境支配',items:[
+        {title:'コンテキスト・ハック（アフォーダンス書き換え）',method:'ビジネスの交渉や難局において、誰もが「次はこうなる」と予測している既存の文脈（アフォーダンス）を、全く異なる評価軸・ユーモア・あるいは完全に引くという行動によって一瞬で書き換える。',effect:'周囲の人間・組織の脳に最大級の「予測エラー（認知バグ）」が発生する。既存のルールであなたを測定できなくなり、あなたが提示した新しいパラダイムに周囲が自動的に同期し始める。',timer:0,breath:null},
+        {title:'意図的同期による「場」の支配',method:'味方に引き入れたい相手・説得したい組織のテンポとビジョンに、一度完璧に同調してみせる。完全に信頼を勝ち取り「身内」と認識された瞬間に、本来の目的へベクトルを静かにシフトする。',effect:'相手の脳が「身内」と認識した状態での方向転換は抵抗なく通る。交渉・説得・組織変革の達人の手法。',timer:0,breath:null}
+      ]},
+      {name:'第4階層 潮流掌握',items:[
+        {title:'主客一如のビジョニング（我欲の完全消去）',method:'「自分が得をしたい・相手をコントロールしたい」というエゴを脳内から完全に消去する。ただ「この場・この組織・この社会全体にとって何が最も美しく調和するか」という一点に脳の全リソースを同期させ、確信を持って一歩を踏み出す。',effect:'あなたの脳と集団の脳ネットワークが脳間同期（ハイパースキャニング・モード）を起こす。言葉で命令しなくても、システム全体が自発的に動き出す「相転移（クリティカリティ）」が発生する。',timer:0,breath:null},
+        {title:'戦略的デカップリング（混沌への飛込）',method:'完璧な調和と成功（秩序）を作り上げたのち、あえてそこに執着せず、次の挑戦・新しいカオスへ自ら飛び込む。成功した瞬間が次の出発点になる。',effect:'常に進化し続けるバイオリズムが生まれ、人生に「飽き」や「停滞」が来なくなる。変化の波を起こし続ける生き方がカリスマの源泉となる。',timer:0,breath:null}
+      ]}
+    ]
+  }
+};
+
+const MISSIONS=[
+  {phase:'第1階層 — 覚醒',text:'今日の通勤・外出中、すれ違う人を「点」で見ず、背後の空間全体をぼんやり見たまますれ違う。何人できたか数える。',mode:'budo'},
+  {phase:'第1階層 — 覚醒',text:'今日の会話で1回だけ、相手が話し終えた後に「3秒の沈黙」を作り、その沈黙の間に相手の空間全体を周辺視野で包み込む。',mode:'renai'},
+  {phase:'第1階層 — 覚醒',text:'今日起きた小さなトラブルに対して「最悪だ」とラベルを貼らず、「ただ、そういう現象が起きている」とだけ認識する。',mode:'jinsei'},
+  {phase:'第2階層 — 変革',text:'誰かと接触・対面した瞬間、奥歯の噛み締め・肩甲骨間の強ばり・土踏まずの力みをすべて同時に解放する。3回実践。',mode:'budo'},
+  {phase:'第2階層 — 変革',text:'今日1回、理不尽なことを言われたとき・プレッシャーを感じたとき、息を吐ききって肩を完全に落とし「湖面の状態」を作る。',mode:'jinsei'},
+  {phase:'第3階層 — 統御',text:'今日、誰かの「次にこう来るだろう」という予測を1回だけ意図的に裏切る。普段とは全く違う返答・行動を差し込む。',mode:'renai'},
+  {phase:'第4階層 — 神妙',text:'今日の会話・作業中に「うまくやろう・認められたい」という意図を一度意識し、完全に手放す瞬間を作る。',mode:'jinsei'},
+];
+
+// ═══ STATE ═══
+let state={
+  currentMode:'budo',
+  currentPhase:0,
+  currentChara:'muto',
+  growth:{
+    budo:[10,5,0,0],
+    renai:[8,3,0,0],
+    jinsei:[6,2,0,0]
+  },
+  missions:[],
+  todayMission:null,
+  journals:[],
+  chatHistory:[]
+};
+
+function saveState(){ try{localStorage.setItem('zm_state',JSON.stringify(state));}catch(e){} }
+function loadState(){
+  try{
+    const s=localStorage.getItem('zm_state');
+    if(s){const d=JSON.parse(s);Object.assign(state,d);}
+  }catch(e){}
+}
+
+// ═══ 初期化 ═══
+window.addEventListener('load',()=>{
+  loadState();
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('hide');
+  },1800);
+  renderRadar();
+  renderMission();
+  renderJournal();
+  initChat();
+});
+
+// ═══ ナビ ═══
+function goScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='dojo') scrollChatBottom();
+}
+window.goScreen=goScreen;
+
+function goTraining(mode){
+  state.currentMode=mode;
+  state.currentPhase=0;
+  saveState();
+  renderTraining();
+  goScreen('training');
+}
+window.goTraining=goTraining;
+
+// ═══ ミッション ═══
+function renderMission(){
+  const today=new Date().toDateString();
+  if(!state.todayMission||state.todayMission.date!==today){
+    const idx=Math.floor(Math.random()*MISSIONS.length);
+    state.todayMission={...MISSIONS[idx],date:today,done:false};
+    saveState();
+  }
+  const m=state.todayMission;
+  document.getElementById('mission-phase').textContent=m.phase;
+  document.getElementById('mission-text').textContent=m.text;
+  if(m.done){
+    document.querySelector('.mission-done-btn').textContent='✓ 完了済み';
+    document.querySelector('.mission-done-btn').disabled=true;
+    document.querySelector('.mission-done-btn').style.opacity='.5';
+  }
+}
+
+function completeMission(){
+  state.todayMission.done=true;
+  const m=state.todayMission;
+  const mi=MISSIONS.findIndex(x=>x.text===m.text);
+  const phaseIdx=m.phase.includes('1')?0:m.phase.includes('2')?1:m.phase.includes('3')?2:3;
+  if(state.growth[m.mode||'budo']){
+    state.growth[m.mode||'budo'][phaseIdx]=Math.min(100,state.growth[m.mode||'budo'][phaseIdx]+15);
+  }
+  saveState();
+  renderRadar();
+  renderMission();
+  showToast('✓ 脳OSを更新しました');
+}
+window.completeMission=completeMission;
+
+// ═══ レーダー ═══
+function renderRadar(){
+  const phases=['覚醒','変革','統御','神妙'];
+  const modes=[
+    {key:'budo',label:'武道',cls:'budo'},
+    {key:'renai',label:'恋愛',cls:'renai'},
+    {key:'jinsei',label:'人生',cls:'jinsei'}
+  ];
+  const bars=document.getElementById('radar-bars');
+  bars.innerHTML=phases.map((p,i)=>
+    modes.map(m=>`
+      <div class="rbar">
+        <div class="rbar-label" style="font-size:9px;">${m.label} ${p}</div>
+        <div class="rbar-track"><div class="rbar-fill ${m.cls}" style="width:${state.growth[m.key][i]}%"></div></div>
+        <div class="rbar-pct">${state.growth[m.key][i]}</div>
+      </div>`).join('')
+  ).join('');
+}
+
+// ═══ 訓練 ═══
+function renderTraining(){
+  const td=TRAININGS[state.currentMode];
+  document.getElementById('training-eyebrow').textContent=td.label;
+  const tabs=document.getElementById('phase-tabs');
+  tabs.innerHTML=td.phases.map((p,i)=>
+    `<button class="phase-tab${i===state.currentPhase?' active':''}" data-phase="${i}" onclick="switchPhase(${i})">${p.name}</button>`
+  ).join('');
+  renderPhaseContent();
+}
+
+function switchPhase(idx){
+  state.currentPhase=idx;
+  document.querySelectorAll('.phase-tab').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  renderPhaseContent();
+}
+window.switchPhase=switchPhase;
+
+function renderPhaseContent(){
+  const td=TRAININGS[state.currentMode];
+  const phase=td.phases[state.currentPhase];
+  document.getElementById('training-content').innerHTML=phase.items.map((item,i)=>`
+    <div class="training-card">
+      <div class="training-num">訓練 ${i+1}</div>
+      <div class="training-title">${item.title}</div>
+      <div class="training-method">${item.method}</div>
+      <div class="training-effect">${item.effect}</div>
+      ${item.game==='killer_phrase'
+        ? `<button class="timer-btn" onclick="startKillerPhraseGame()" style="background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:none;padding:12px 20px;border-radius:10px;font-size:12px;font-weight:800;width:100%;margin-top:12px;cursor:pointer;">🎯 ゲームを開始する</button>
+           <div id="kp-game-area" style="margin-top:12px;"></div>`
+        : item.game==='decouple_judgment'
+        ? `<button class="timer-btn" onclick="startDecoupleGame()" style="background:linear-gradient(135deg,#c20030,var(--red));color:#fff;border:none;padding:12px 20px;border-radius:10px;font-size:12px;font-weight:800;width:100%;margin-top:12px;cursor:pointer;">⚡ 判定ゲームを開始する</button>
+           <div id="dc-game-area" style="margin-top:12px;"></div>`
+        : item.breath
+          ? `<button class="timer-btn" onclick="startBreathTimer(${JSON.stringify(item.breath)})">🫁 ${item.breath.label}を開始（${item.breath.sets}セット）</button>`
+          : item.timer>0
+            ? `<button class="timer-btn" onclick="startTimer(${item.timer},'${item.title}')">⏱ ${Math.floor(item.timer/60)?Math.floor(item.timer/60)+'分':''}${item.timer%60?item.timer%60+'秒':''}タイマー</button>`
+            : ''
+      }
+    </div>`).join('');
+}
+
+// ═══ デカップリング判定ゲーム ═══
+const DC_SCENARIOS=[
+  {syn:78,chaos:55,scene:'2時間のデートが最高潮。彼女は笑顔が止まらず「もっと話したい」と言っている。',answer:'pull',reason:'SYN78は依存一歩手前の絶頂。このタイミングで引くことで脳間同期が突如遮断され、最大の予測エラーを与えられる。さらに引き際のスマートさがコストリーシグナルになる。'},
+  {syn:32,chaos:45,scene:'LINEを2日間送り続けたが反応が薄い。今日やっと「まあね」と返ってきた。',answer:'stay',reason:'SYN32はまだ警戒段階。ここで引いても相手の脳には何も残らない。むしろ引いたことに気づかれもしない。今はSYNを70以上に引き上げる同期フェーズ。'},
+  {syn:65,chaos:22,scene:'カフェで1時間。彼女の話に深く共感し続け、「あなたって話しやすい」と言われた。',answer:'pull',reason:'CHAOS22は「読まれすぎ」の危険域。同期は十分。このまま続けると「都合のいい友達」で固定される。今すぐカオスを投下するか引いてデカップリングするかの二択。'},
+  {syn:88,chaos:60,scene:'3回目のデート終盤。「今日楽しかった、また絶対会いたい」と目を輝かせている。',answer:'pull',reason:'SYN88は依存完成に限りなく近い。この状態で「じゃあ俺帰るね」と先に切り上げると、相手の脳は最大の予測エラーと喪失感を起こし24時間あなたのことを考え続ける。これがデカップリングの完成形。'},
+  {syn:45,chaos:72,scene:'初めて会った女性。テンションは高いが会話が弾んでいない感じがする。',answer:'stay',reason:'SYN45でCHAOS72は「まだ引き込めていないのにカオスだけが高い」状態。ここで引いても相手の予測エラーにはならず、ただ「興味のない人」として処理される。まず脱力・安心感でSYNを高める段階。'},
+  {syn:71,chaos:38,scene:'LINEのやり取りが毎日続いている。彼女から「最近何してる？」と先に送ってくるようになった。',answer:'pull',reason:'SYN71で先に送ってくるのは依存の証拠。CHAOS38は少し低いがSYNが基準値を超えている。ここで既読をつけてから数時間〜半日返信を遅らせることで、相手の脳に予測エラーと喪失感を植え付けられる。'},
+  {syn:20,chaos:50,scene:'初対面。会話が始まったばかりで相手の様子を探っている段階。',answer:'stay',reason:'SYN20は警戒段階の入り口。デカップリングは「同期した後に切断する」技術。まだ同期が始まってもいない段階での引きは効果ゼロ。今はエレイズ・脱力・周辺視野で存在をステルス化し、ミラーニューロン経由でSYNを上げる段階。'},
+  {syn:82,chaos:65,scene:'告白しようと思っていたが、直前に彼女が「友達として大切にしたい」と言った。',answer:'pull',reason:'SYN82かつ「友達として」発言は、依存しているが恋愛として認識していない「恋愛未満の依存状態」。ここで引いて距離を置くことで、彼女の脳は喪失感とともに「なぜ大切だと思っているのか」を自問し始める。これがフォワードモデルの再構築を促す。'},
+];
+
+let _dcScenario=null,_dcRound=0,_dcCorrect=0;
+
+function startDecoupleGame(){
+  _dcRound=0;_dcCorrect=0;
+  nextDcRound();
+}
+
+function nextDcRound(){
+  _dcRound++;
+  _dcScenario=DC_SCENARIOS[(_dcRound-1)%DC_SCENARIOS.length];
+  const area=document.getElementById('dc-game-area');
+  const synColor=_dcScenario.syn>=70?'#ef4444':_dcScenario.syn>=40?'#f59e0b':'#3b82f6';
+  const chaosColor=_dcScenario.chaos>=60?'#f59e0b':_dcScenario.chaos>=35?'#22c55e':'#3b82f6';
+  area.innerHTML=`
+    <div class="dc-scenario">
+      <div class="dc-scenario-label">ROUND ${_dcRound} — 今が絶頂か判断しろ</div>
+      <div class="dc-scores">
+        <div class="dc-score-item">
+          <div class="dc-score-val" style="color:${synColor};">${_dcScenario.syn}</div>
+          <div class="dc-score-lbl">SYN（同期）</div>
+        </div>
+        <div class="dc-score-item">
+          <div class="dc-score-val" style="color:${chaosColor};">${_dcScenario.chaos}</div>
+          <div class="dc-score-lbl">CHAOS（カオス）</div>
+        </div>
+      </div>
+      <div class="dc-scene">${_dcScenario.scene}</div>
+    </div>
+    <div class="dc-choice-row">
+      <button class="dc-btn dc-pull" onclick="judgeDc('pull')">⚡ 今すぐ引く</button>
+      <button class="dc-btn dc-stay" onclick="judgeDc('stay')">💙 まだ引かない</button>
+    </div>
+    <div id="dc-result"></div>`;
+}
+
+function judgeDc(choice){
+  const correct=choice===_dcScenario.answer;
+  if(correct) _dcCorrect++;
+  const resEl=document.getElementById('dc-result');
+  const isLast=_dcRound>=DC_SCENARIOS.length;
+  resEl.innerHTML=`
+    <div class="${correct?'dc-correct':'dc-wrong'}" style="margin-top:12px;">
+      ${correct?'✅ 正解':'❌ 不正解'}：${_dcScenario.answer==='pull'?'→ 今すぐ引くべきだった':'→ まだ引くべきではなかった'}
+    </div>
+    <div style="font-size:12px;color:var(--txt2);line-height:1.8;padding:10px;background:var(--bg3);border-radius:8px;margin-top:6px;">${_dcScenario.reason}</div>
+    ${isLast
+      ? `<div style="text-align:center;padding:16px;"><div style="font-size:24px;font-weight:900;color:var(--gold);">${_dcCorrect}/${DC_SCENARIOS.length}</div><div style="font-size:11px;color:var(--txt2);margin-top:4px;">${_dcCorrect>=6?'達人レベル：デカップリング判断が身についている':_dcCorrect>=4?'中級：もう少し感覚を磨け':'初心者：理論を再確認してから再挑戦'}</div><button onclick="startDecoupleGame()" style="margin-top:12px;padding:11px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,#c20030,var(--red));color:#fff;font-size:13px;font-weight:800;cursor:pointer;">もう一度やる</button></div>`
+      : `<button onclick="nextDcRound()" style="width:100%;margin-top:10px;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#c20030,var(--red));color:#fff;font-size:13px;font-weight:800;cursor:pointer;">次のシナリオ → (${_dcRound}/${DC_SCENARIOS.length})</button>`
+    }`;
+
+  // 成長ポイント更新（正解でrenai Phase4+8）
+  if(correct){
+    state.growth['renai'][3]=Math.min(100,state.growth['renai'][3]+8);
+    saveState(); renderRadar();
+  }
+}
+window.startDecoupleGame=startDecoupleGame;
+window.judgeDc=judgeDc;
+window.nextDcRound=nextDcRound;
+const KP_CHARAS=[
+  {type:'活発・陽キャ系',desc:'いつも明るく笑顔。グループの中心にいる。テンションが高くよく喋る。一人でいることをあまり見せない。'},
+  {type:'強がり・ツンデレ',desc:'意見をはっきり言う。批判的なことも臆せず言う。感情をあまり表に出さない。弱みを見せるのが苦手そう。'},
+  {type:'大人しい・内向き',desc:'静かで口数が少ない。でも話すと深いことを言う。一人の時間を大切にしている。目立つことを避けている。'},
+  {type:'論理的・クール',desc:'感情より事実や根拠で話す。冷静沈着で動じない。計画的で無駄を嫌う。感情表現が少ない。'},
+  {type:'甘えたがり',desc:'人懐っこくよく甘える。承認欲求が高め。誰かに頼りたい様子が見える。寂しがり屋な面がある。'},
+  {type:'知的・ミステリアス',desc:'博識で話題が豊富。どこかミステリアスな雰囲気がある。自分のことをあまり話さない。考えていることが読めない。'},
+  {type:'明るい・社交的',desc:'初対面でも打ち解けるのが早い。友人が多い。場の空気を明るくする。悩みを人に見せない。'},
+  {type:'感情的・共感型',desc:'人の気持ちに敏感。よく泣く・よく笑う。感情を素直に出す。相手の感情を引き受けすぎることがある。'},
+];
+
+let _kpChara=null,_kpRound=0,_kpTotal=0;
+
+function startKillerPhraseGame(){
+  _kpRound=0;_kpTotal=0;
+  nextKpRound();
+}
+
+function nextKpRound(){
+  _kpRound++;
+  _kpChara=KP_CHARAS[Math.floor(Math.random()*KP_CHARAS.length)];
+  const area=document.getElementById('kp-game-area');
+  area.innerHTML=`
+    <div class="kp-chara-card">
+      <div class="kp-chara-label">ROUND ${_kpRound} — 表向きのキャラクター</div>
+      <div class="kp-chara-text">${_kpChara.type}</div>
+      <div class="kp-chara-sub">${_kpChara.desc}</div>
+    </div>
+    <div style="font-size:11px;color:var(--txt2);margin-bottom:6px;">この人の「陰（隠された本音・孤独・渇望）」を言い当てろ：</div>
+    <textarea class="kp-input" id="kp-answer" rows="3" placeholder="例：本当は誰かに全部わかってほしい。強がりの裏に深い孤独がある..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button onclick="submitKillerPhrase()" style="flex:2;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--purple,#7c3aed),var(--purple2,#a855f7));color:#fff;font-size:13px;font-weight:800;cursor:pointer;">🎯 採点してもらう</button>
+      <button onclick="nextKpRound()" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--bor);background:transparent;color:var(--txt2);font-size:11px;cursor:pointer;">スキップ</button>
+    </div>
+    <div id="kp-result"></div>`;
+}
+
+async function submitKillerPhrase(){
+  const answer=document.getElementById('kp-answer')?.value.trim();
+  if(!answer){showToast('陰を入力してください');return;}
+  const resEl=document.getElementById('kp-result');
+  resEl.innerHTML='<div style="text-align:center;padding:16px;color:var(--txt3);font-size:12px;">採点中...<br><span style="display:inline-block;width:6px;height:6px;background:var(--purple);border-radius:50%;animation:td .8s infinite;"></span></div>';
+  document.querySelector('#kp-game-area button').disabled=true;
+
+  const prompt=`あなたは脳神経科学×進化心理学の達人コーチです。
+ユーザーが「${_kpChara.type}（${_kpChara.desc}）」という相手の「陰（隠された本音）」を以下のように推測しました：
+「${answer}」
+
+以下のフォーマットで採点してください：
+
+=SCORE=
+[S/A/B/Cの1文字のみ。S=完璧な洞察、A=鋭い、B=まあ当たっている、C=表面的]
+
+=REAL_SHADOW=
+[本当の「陰」：バーナム効果×進化心理学的に最も刺さる本音を2行]
+
+=KILLER_PHRASE=
+[実際に使えるキラーフレーズ1本。「実は〇〇でしょ。今、目の奥が揺れた」形式で。瞳孔・視線の根拠を含む]
+
+=FEEDBACK=
+[ユーザーの推測へのフィードバック：1行]`;
+
+  try{
+    const r=await fetch('https://us-central1-kensetsu-nippo-842a2.cloudfunctions.net/askAI',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Access-Key':'HeartsHouse2026Key'},
+      body:JSON.stringify({model:'gemini-2.5-flash',prompt,useSearch:false})
+    });
+    const json=await r.json().catch(()=>({}));
+    const text=json?.data?.text||json?.candidates?.[0]?.content?.parts?.[0]?.text||json?.text||'';
+    const get=(tag)=>{const m=text.match(new RegExp('='+tag+'=\\s*([\\s\\S]*?)(?==|$)'));return m?m[1].trim():'';};
+    const score=get('SCORE').charAt(0).toUpperCase();
+    const shadow=get('REAL_SHADOW');
+    const killer=get('KILLER_PHRASE');
+    const fb=get('FEEDBACK');
+    const scoreClass=score==='S'?'s':score==='A'?'a':score==='B'?'b':'c';
+    const scoreMsg=score==='S'?'完璧な洞察':score==='A'?'鋭い':score==='B'?'まあ当たっている':'表面的';
+
+    resEl.innerHTML=`
+      <div class="kp-score ${scoreClass}">${score}<span style="font-size:14px;margin-left:8px;">${scoreMsg}</span></div>
+      ${fb?`<div style="font-size:11px;color:var(--txt2);margin-bottom:8px;line-height:1.7;">${fb}</div>`:''}
+      ${shadow?`<div style="font-size:11px;color:var(--txt2);margin-bottom:6px;font-weight:700;">本当の「陰」：</div><div style="font-size:12px;color:var(--txt);background:var(--bg3);border-radius:8px;padding:10px;margin-bottom:8px;line-height:1.7;">${shadow}</div>`:''}
+      ${killer?`<div class="kp-killer">💀 ${killer}</div>`:''}
+      <button onclick="nextKpRound()" style="width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;font-size:13px;font-weight:800;cursor:pointer;margin-top:8px;">次のキャラ →</button>`;
+
+    // 成長ポイント更新
+    if(score==='S'||score==='A'){
+      state.growth['renai'][2]=Math.min(100,state.growth['renai'][2]+10);
+      saveState(); renderRadar();
+    }
+  }catch(e){
+    resEl.innerHTML='<div style="color:var(--red);font-size:12px;padding:8px;">エラー: '+e.message+'</div>';
+  }
+}
+window.startKillerPhraseGame=startKillerPhraseGame;
+window.submitKillerPhrase=submitKillerPhrase;
+window.nextKpRound=nextKpRound;
+let timerInterval=null;
+
+// 呼吸タイマー（ボックス呼吸・エレイズ呼吸）
+function startBreathTimer(breath){
+  document.getElementById('timer-label').textContent=breath.label;
+  document.getElementById('timer-overlay').classList.add('show');
+  let set=1, phase=0;
+  const phases=breath.hold2>0
+    ?[{label:'吸う',sec:breath.inhale},{label:'止める',sec:breath.hold1},{label:'吐く',sec:breath.exhale},{label:'止める',sec:breath.hold2}]
+    :[{label:'吸う',sec:breath.inhale},{label:'止める',sec:breath.hold1},{label:'吐く',sec:breath.exhale}];
+  const nonZero=phases.filter(p=>p.sec>0);
+  let phIdx=0, remain=nonZero[0].sec;
+
+  function tick(){
+    document.getElementById('timer-display').textContent=remain;
+    document.getElementById('timer-label').textContent=
+      `${breath.label}  ${set}/${breath.sets}セット目　「${nonZero[phIdx].label}」`;
+    remain--;
+    if(remain<0){
+      phIdx++;
+      if(phIdx>=nonZero.length){
+        phIdx=0; set++;
+        if(set>breath.sets){
+          clearInterval(timerInterval);
+          document.getElementById('timer-overlay').classList.remove('show');
+          showToast('✓ '+breath.label+'完了');
+          return;
+        }
+      }
+      remain=nonZero[phIdx].sec;
+    }
+  }
+  tick();
+  timerInterval=setInterval(tick,1000);
+}
+
+function startTimer(sec,label){
+  document.getElementById('timer-label').textContent=label;
+  let remain=sec;
+  updateTimerDisplay(remain);
+  document.getElementById('timer-overlay').classList.add('show');
+  timerInterval=setInterval(()=>{
+    remain--;
+    updateTimerDisplay(remain);
+    if(remain<=0){
+      clearInterval(timerInterval);
+      document.getElementById('timer-overlay').classList.remove('show');
+      showToast('✓ 訓練完了');
+    }
+  },1000);
+}
+function stopTimer(){
+  clearInterval(timerInterval);
+  document.getElementById('timer-overlay').classList.remove('show');
+}
+function updateTimerDisplay(sec){
+  const m=Math.floor(sec/60),s=sec%60;
+  document.getElementById('timer-display').textContent=`${m}:${String(s).padStart(2,'0')}`;
+}
+window.startTimer=startTimer;
+window.startBreathTimer=startBreathTimer;
+window.stopTimer=stopTimer;
+
+// ═══ AIチャット ═══
+function initChat(){
+  const c=CHARAS[state.currentChara];
+  const area=document.getElementById('chat-area');
+  if(area.innerHTML===''){
+    addChatMsg('ai',`${c.icon} 問いかけよ。導こう。`);
+  }
+}
+
+function selectChara(id){
+  state.currentChara=id;
+  document.querySelectorAll('.chara-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+id).classList.add('active');
+  state.chatHistory=[];
+  const area=document.getElementById('chat-area');
+  area.innerHTML='';
+  const c=CHARAS[id];
+  addChatMsg('ai',`${c.icon} 私は${c.name}。${c.style}の道を歩む者。何を問う？`);
+  saveState();
+}
+window.selectChara=selectChara;
+
+function addChatMsg(role,text){
+  const area=document.getElementById('chat-area');
+  const c=CHARAS[state.currentChara];
+  const div=document.createElement('div');
+  div.className='chat-msg '+role;
+  div.innerHTML=role==='ai'
+    ?`<div class="chara-label">${c.icon} ${c.name}</div><div class="chat-bubble">${text.replace(/\n/g,'<br>')}</div>`
+    :`<div class="chat-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  area.appendChild(div);
+  scrollChatBottom();
+}
+
+function scrollChatBottom(){
+  const a=document.getElementById('chat-area');
+  if(a) a.scrollTop=a.scrollHeight;
+}
+
+async function sendChat(){
+  const ta=document.getElementById('chat-ta');
+  const text=ta.value.trim();
+  if(!text) return;
+  ta.value='';
+  ta.style.height='44px';
+  addChatMsg('user',text);
+  state.chatHistory.push({role:'user',content:text});
+
+  const c=CHARAS[state.currentChara];
+  const thinking=document.createElement('div');
+  thinking.className='chat-msg ai';
+  thinking.id='thinking';
+  thinking.innerHTML=`<div class="chara-label">${c.icon} ${c.name}</div><div class="chat-bubble" style="color:var(--txt3)">...</div>`;
+  document.getElementById('chat-area').appendChild(thinking);
+  scrollChatBottom();
+
+  try{
+    const prompt=state.chatHistory.map(m=>m.role+': '+m.content).join('\n')+'\n\n'+text;
+    const r=await fetch(FUNC_BASE+'/askAI',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Access-Key':HH_KEY},
+      body:JSON.stringify({model:'gemini-2.5-flash',prompt:c.system+'\n\n'+prompt,useSearch:false})
+    });
+    const json=await r.json().catch(()=>({}));
+    const reply=json?.data?.text||json?.candidates?.[0]?.content?.parts?.[0]?.text||json?.text||'...';
+    thinking.remove();
+    addChatMsg('ai',reply);
+    state.chatHistory.push({role:'assistant',content:reply});
+    if(state.chatHistory.length>20) state.chatHistory=state.chatHistory.slice(-20);
+    saveState();
+  }catch(e){
+    thinking.remove();
+    addChatMsg('ai','…通信の乱れ。もう一度問いかけよ。');
+  }
+}
+window.sendChat=sendChat;
+
+function autoResize(el){
+  el.style.height='44px';
+  el.style.height=Math.min(el.scrollHeight,100)+'px';
+}
+window.autoResize=autoResize;
+
+// ═══ ジャーナル ═══
+function renderJournal(){
+  const list=document.getElementById('journal-list');
+  if(!state.journals.length){
+    list.innerHTML='<div style="text-align:center;color:var(--txt3);font-size:12px;padding:30px;">まだ記録がありません。<br>今日の気づきを刻もう。</div>';
+    return;
+  }
+  list.innerHTML=state.journals.slice().reverse().map(j=>`
+    <div class="journal-entry">
+      <div class="journal-date">${j.date}</div>
+      <div class="journal-mode-badge badge-${j.mode}">${j.modeLabel}</div>
+      <div class="journal-text">${j.text}</div>
+      ${j.insight?`<div class="journal-ai-insight">${j.insight}</div>`:''}
+    </div>`).join('');
+}
+
+async function saveJournal(){
+  const ta=document.getElementById('jform-ta');
+  const text=ta.value.trim();
+  if(!text){showToast('気づきを入力してください');return;}
+  const mode=document.getElementById('jform-mode').value;
+  const modeLabels={budo:'🥷 武道',renai:'🌒 恋愛',jinsei:'🌌 人生'};
+  const now=new Date();
+  const dateStr=now.getFullYear()+'/'+(now.getMonth()+1)+'/'+now.getDate()+' '+now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+
+  const entry={date:dateStr,mode,modeLabel:modeLabels[mode],text,insight:''};
+  state.journals.push(entry);
+  saveState();
+  ta.value='';
+  renderJournal();
+  showToast('記録しました。AIが解釈中...');
+
+  // AIに達人フレームで解釈させる
+  const chara=mode==='budo'?CHARAS.muto:mode==='renai'?CHARAS.midori:CHARAS.kuro;
+  try{
+    const prompt=chara.system+'\n\n以下の訓練の気づきを達人の視点から30字以内で一言解釈してください。\n\n「'+text+'」';
+    const r=await fetch(FUNC_BASE+'/askAI',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Access-Key':HH_KEY},
+      body:JSON.stringify({model:'gemini-2.5-flash',prompt,useSearch:false})
+    });
+    const json=await r.json().catch(()=>({}));
+    const insight=json?.data?.text||json?.candidates?.[0]?.content?.parts?.[0]?.text||json?.text||'';
+    entry.insight=insight;
+    state.journals[state.journals.length-1].insight=insight;
+    saveState();
+    renderJournal();
+  }catch(e){}
+
+  // Firestoreにも保存
+  const fb=window.__zm;
+  if(fb&&window._uid){
+    try{
+      await fb.addDoc(fb.collection(fb.db,'users',window._uid,'zm_journals'),{
+        ...entry,createdAt:fb.serverTimestamp()
+      });
+    }catch(e){}
+  }
+}
+window.saveJournal=saveJournal;
+
+// ═══ Toast ═══
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+window.showToast=showToast;
+</script>
+</body>
+</html>
